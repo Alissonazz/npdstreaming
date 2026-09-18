@@ -1,4 +1,5 @@
 package com.npd.npdstreaming.UserInteraction;
+
 import com.npd.npdstreaming.Repository.SeriesRepository;
 import com.npd.npdstreaming.model.*;
 import com.npd.npdstreaming.service.ApiConsumption;
@@ -20,14 +21,15 @@ public class Menu {
     private final String FINAL_ADDRESS = "&apikey=";
     private List<SeriesData> listedSeries = new ArrayList<>();
     private List<Serie> series = new ArrayList<>();
+    private String serieName;
 
     @Autowired
     private SeriesRepository seriesRepository;
 
     @Value("${omdb.api.key}")
-    private String OmdbApiKey;
+    private String omdbApiKey;
 
-    public Menu (ApiConsumption apiConsumption, DataConvert convert) {
+    public Menu(ApiConsumption apiConsumption, DataConvert convert) {
         this.apiConsumption = apiConsumption;
         this.convert = convert;
     }
@@ -42,7 +44,9 @@ public class Menu {
                     3 - Buscar séries por categoria
                     4 - Buscar episódios
                     5 - Listar séries buscadas
-                    6 - Top 5 séries
+                    6 - Filtrar séries
+                    7 - Top 5 séries
+                    8 - Top 5 Episódios
                     
                     0 - Sair                                
                     """;
@@ -68,7 +72,13 @@ public class Menu {
                     listSeries();
                     break;
                 case 6:
+                    filterBySeasonAndRating();
+                    break;
+                case 7:
                     topSeries();
+                    break;
+                case 8:
+                    topEpisodes();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -80,45 +90,61 @@ public class Menu {
     }
 
     private void searchWebSeries() {
-        SeriesData data = getSeriesData();
-        Serie s = new Serie(data);
-        seriesRepository.save(s);
-        System.out.println(data);
-    }
-
-    private SeriesData getSeriesData() {
+        series = seriesRepository.findAll();
         System.out.println("Digite o nome da série que deseja buscar: ");
-        var serieName  = scan.nextLine();
-        var json = apiConsumption.obtainData(ADDRESS + serieName.replace(" ", "+") + FINAL_ADDRESS + OmdbApiKey);
+        serieName = scan.nextLine();
+        var json = apiConsumption.obtainData(ADDRESS + serieName.replace(" ", "+") + FINAL_ADDRESS + omdbApiKey);
         SeriesData data = convert.obtainData(json, SeriesData.class);
-        return data;
+        Serie s = new Serie(data);
+        if (series.stream().anyMatch(serie -> serie.getTitle().equalsIgnoreCase(serieName))) {
+            System.out.println(data);
+        } else {
+            System.out.println(data);
+            seriesRepository.save(s);
+            saveEpisode(s);
+        }
     }
 
-    private void searchEpisodes(){
-        listSeries();
-        System.out.println("Digite uma série para ver os episodios: ");
-        var serieName = scan.nextLine();
-
-        Optional<Serie> serie = seriesRepository.findByTitleContainingIgnoreCase(serieName);
-
+    private void saveEpisode(Serie s) {
+        Optional<Serie> serie = seriesRepository.findByTitleEqualsIgnoreCase(s.getTitle());
         if (serie.isPresent()) {
             List<SeasonsData> seasons = new ArrayList<>();
 
             for (int i = 1; i <= serie.get().getSeasons(); i++) {
-                var json = apiConsumption.obtainData(ADDRESS + serie.get().getTitle().replace(" ", "+") + "&season=" + i + FINAL_ADDRESS + OmdbApiKey);
-                SeasonsData seasonsData = convert.obtainData(json, SeasonsData.class);
+                var jsonSeason = apiConsumption.obtainData(ADDRESS + serie.get().getTitle().replace(" ", "+") + "&season=" + i + FINAL_ADDRESS + omdbApiKey);
+                SeasonsData seasonsData = convert.obtainData(jsonSeason, SeasonsData.class);
                 seasons.add(seasonsData);
             }
-            seasons.forEach(System.out::println);
-
             List<Episode> episodes = seasons.stream()
-                    .flatMap(s -> s.episodes().stream()
-                            .map(e -> new Episode(s.number(), e)))
+                    .flatMap(sd -> sd.episodes().stream()
+                            .map(e -> new Episode(sd.number(), e)))
                     .collect(Collectors.toList());
             serie.get().setEpisodes(episodes);
             seriesRepository.save(serie.get());
+        }
+    }
+
+    private void printEpisodes(String serieName) {
+        List<Episode> episodes = seriesRepository.findEpisodeBySerieTitle(serieName);
+        episodes.forEach(e -> System.out.printf(
+                "Título: %s - Temporada: %d - Episódio: %d - Avaliação: %.1f%n",
+                e.getTitle(), e.getSeason(), e.getNumber(), e.getAssessment()));
+    }
+
+    private void searchEpisodes() {
+        System.out.println("Digite uma série para ver os episodios: ");
+        serieName = scan.nextLine();
+        Optional<Serie> serie = seriesRepository.findByTitleEqualsIgnoreCase(serieName);
+
+        if (serie.isPresent()) {
+            printEpisodes(serieName);
         } else {
-            System.out.println("Série não encontrada!");
+            var json = apiConsumption.obtainData(ADDRESS + serieName.replace(" ", "+") + FINAL_ADDRESS + omdbApiKey);
+            SeriesData data = convert.obtainData(json, SeriesData.class);
+            Serie s = new Serie(data);
+            seriesRepository.save(s);
+            saveEpisode(s);
+            printEpisodes(serieName);
         }
     }
 
@@ -138,32 +164,56 @@ public class Menu {
             System.out.println("Certifique-se de que o nome do ator foi digitado corretamente.");
         } else {
             seriesByActor.forEach(s ->
-                    System.out.println(s.getTitle() + " - Avaliação: " + s.getImdbRating())
+                    System.out.println(s.getTitle() + " - Avaliação: " + s.getOmdbRating())
             );
         }
     }
 
     public void topSeries() {
         System.out.println("Top 5 séries: ");
-        List<Serie> seriesOrderByRating = seriesRepository.findByOrderByImdbRatingDesc();
+        List<Serie> seriesOrderByRating = seriesRepository.findByOrderByOmdbRatingDesc();
         List<Serie> topFive = seriesOrderByRating.stream()
                 .limit(5)
                 .collect(Collectors.toList());
 
         topFive.forEach(s ->
-                System.out.println(s.getTitle() + " - Avaliação: " + s.getImdbRating()));
+                System.out.println(s.getTitle() + " - Avaliação: " + s.getOmdbRating()));
     }
 
-    public void searchForSeriesByCategory() {
-        System.out.println("Digite a categoria que deseja buscar: ");
-        var categoryName = scan.nextLine();
-        Category category = Category.fromStringPt(categoryName);
-        List<Serie> seriesByCategory = seriesRepository.findByGenre(category);
-        System.out.println("\nSéries da catégoria " + categoryName + ":");
-        seriesByCategory.forEach(s ->
+    private void searchForSeriesByCategory() {
+        System.out.println("Digite gênero que deseja buscar: ");
+        var genreName = scan.nextLine();
+        Category category = Category.fromStringPt(genreName);
+        List<Serie> seriesByGenre = seriesRepository.findByGenre(category);
+        System.out.println("\nSéries da catégoria " + genreName + ":");
+        seriesByGenre.forEach(s ->
                 System.out.println("\nTítulo: " + s.getTitle() +
                         "\nSinopse: " + s.getSynopsis() +
-                        "\nAvaliação: " + s.getImdbRating()));
+                        "\nAvaliação: " + s.getOmdbRating()));
+    }
+
+
+    private void filterBySeasonAndRating() {
+        System.out.println("Filtrar séries até quantas temporadas? ");
+        var totalSeasons = scan.nextInt();
+        System.out.println("Com avaliação a partir de qual valor? ");
+        var rating = scan.nextDouble();
+        scan.nextLine();
+        List<Serie> seriesFilter = seriesRepository.seriesBySeasonAndRating(totalSeasons, rating);
+        System.out.println("*** Séries filtradas ***");
+        seriesFilter.forEach(s ->
+                System.out.println(s.getTitle() + "  - avaliação: " + s.getOmdbRating()));
+    }
+
+    private void topEpisodes() {
+        searchWebSeries();
+        List<Episode> topFiveEpisodes = seriesRepository.findByTopEpisodes(serieName);
+        topFiveEpisodes.forEach(e -> System.out.printf(
+                "Título: %s - Temporada: %d - Episódio: %d - Avaliação: %.1f\n",
+                e.getTitle(), e.getSeason(), e.getNumber(), e.getAssessment()));
     }
 
 }
+
+
+

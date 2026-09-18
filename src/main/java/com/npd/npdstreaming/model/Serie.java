@@ -16,7 +16,7 @@ public class Serie {
     @Column(unique = true)
     private String title;
     private Integer seasons;
-    private Double imdbRating;
+    private Double omdbRating;
     @Enumerated(EnumType.STRING)
     private Category genre;
     private String actors;
@@ -31,7 +31,7 @@ public class Serie {
     public Serie(SeriesData seriesData) {
         this.title = seriesData.title();
         this.seasons = seriesData.seasons();
-        this.imdbRating = OptionalDouble.of(Double.valueOf(seriesData.imdbRating())).orElse(0);
+        this.omdbRating = OptionalDouble.of(Double.valueOf(seriesData.imdbRating())).orElse(0);
         this.genre = Category.fromString(seriesData.genre().split(",")[0].trim());
         this.actors = seriesData.actors();
         this.poster = seriesData.poster();
@@ -67,12 +67,12 @@ public class Serie {
         this.seasons = seasons;
     }
 
-    public Double getImdbRating() {
-        return imdbRating;
+    public Double getOmdbRating() {
+        return omdbRating;
     }
 
-    public void setImdbRating(Double imdbRating) {
-        this.imdbRating = imdbRating;
+    public void setOmdbRating(Double omdbRating) {
+        this.omdbRating = omdbRating;
     }
 
     public Category getGenre() {
@@ -114,7 +114,7 @@ public class Serie {
                         "\nTítulo: " + title+
                         "\nSinopse: " + synopsis +
                         "\nTemporadas: " + seasons+
-                        "\nAvaliação Imdb: " + imdbRating +
+                        "\nAvaliação Imdb: " + omdbRating +
                         "\nAtores: " + actors +
                         "\nLink do Pôster: " + poster +
                         "\nEpisodios: " + episodes;

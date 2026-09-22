@@ -12,33 +12,7 @@ import java.util.Optional;
 
 public interface SeriesRepository extends JpaRepository<Serie, Long> {
 
-    Optional<Serie> findByTitleEqualsIgnoreCase(String titleSerie);
-
-    List<Serie> findByActorsContainingIgnoreCase(String nameActor);
-
-    List<Serie> findByOrderByImdbRatingDesc();
-
     List<Serie> findByGenre(Category category);
-
-    @Query("""
-            SELECT e FROM Episode e 
-            JOIN e.serie s 
-            WHERE LOWER(s.title) = LOWER(:serieName) 
-            ORDER BY e.season ASC
-            """)
-    List<Episode> findEpisodeBySerieTitle(String serieName);
-
-    @Query("SELECT s FROM Serie s WHERE s.season <= :season AND s.imdbRating >= :imdbRating")
-    List<Serie> seriesBySeasonAndRating(int season, double imdbRating);
-
-    @Query("""
-            SELECT e FROM Episode e 
-            JOIN e.serie s 
-            WHERE LOWER(s.title) = LOWER(:serieName) 
-            ORDER BY e.ratingEpisode DESC 
-            LIMIT 5 
-            """)
-    List<Episode> findByTopEpisodes(String serieName);
 
     List<Serie> findTop5ByOrderByImdbRatingDesc();
 

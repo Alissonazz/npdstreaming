@@ -16,8 +16,8 @@ public class Episode {
     private String titleEpisode;
     @Column(name = "Number")
     private Integer numberEpisode;
-    @Column(name = "Assessment")
-    private Double assessmentEpisode;
+    @Column(name = "Rating")
+    private Double ratingEpisode;
     @Column(name = "Release_Date")
     private LocalDate releaseDateEpisode;
 
@@ -26,19 +26,19 @@ public class Episode {
 
     public Episode (){}
 
-    public Episode(Integer seasonNumber, EpisodesData episodesData) {
+    public Episode(Integer seasonNumber, EpisodeData episodeData) {
         this.season = seasonNumber;
-        this.titleEpisode = episodesData.title();
-        this.numberEpisode = episodesData.number();
+        this.titleEpisode = episodeData.title();
+        this.numberEpisode = episodeData.number();
 
         try {
-            this.assessmentEpisode = Double.valueOf(episodesData.assessment());
+            this.ratingEpisode = Double.valueOf(episodeData.assessment());
         } catch (NumberFormatException ex) {
-            this.assessmentEpisode = 0.0;
+            this.ratingEpisode = 0.0;
         }
 
         try {
-            this.releaseDateEpisode = LocalDate.parse(episodesData.releaseDate());
+            this.releaseDateEpisode = LocalDate.parse(episodeData.releaseDate());
         } catch (DateTimeParseException ex) {
             this.releaseDateEpisode = null;
         }
@@ -69,7 +69,7 @@ public class Episode {
     }
 
     public void setAssessment(Double assessment) {
-        this.assessmentEpisode = assessment;
+        this.ratingEpisode = assessment;
     }
 
     public void setNumber(Integer number) {
@@ -93,7 +93,7 @@ public class Episode {
     }
 
     public Double getAssessment() {
-        return assessmentEpisode;
+        return ratingEpisode;
     }
 
     public LocalDate getReleaseDate() {
@@ -105,7 +105,7 @@ public class Episode {
         return  "season=" + season +
                 ", titleEpisode='" + titleEpisode + '\'' +
                 ", numberEpisode=" + numberEpisode +
-                ", assessmentEpisode='" + assessmentEpisode + '\'' +
+                ", assessmentEpisode='" + ratingEpisode + '\'' +
                 ", releaseDateEpisode=" + releaseDateEpisode;
 
     }

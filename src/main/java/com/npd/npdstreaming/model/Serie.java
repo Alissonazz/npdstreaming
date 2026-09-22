@@ -15,8 +15,8 @@ public class Serie {
     private Long id;
     @Column(unique = true)
     private String title;
-    private Integer seasons;
-    private Double omdbRating;
+    private Integer season;
+    private Double imdbRating;
     @Enumerated(EnumType.STRING)
     private Category genre;
     private String actors;
@@ -28,10 +28,10 @@ public class Serie {
 
     public Serie() {}
 
-    public Serie(SeriesData seriesData) {
+    public Serie(SerieData seriesData) {
         this.title = seriesData.title();
-        this.seasons = seriesData.seasons();
-        this.omdbRating = OptionalDouble.of(Double.valueOf(seriesData.imdbRating())).orElse(0);
+        this.season = seriesData.seasons();
+        this.imdbRating = OptionalDouble.of(Double.valueOf(seriesData.imdbRating())).orElse(0);
         this.genre = Category.fromString(seriesData.genre().split(",")[0].trim());
         this.actors = seriesData.actors();
         this.poster = seriesData.poster();
@@ -41,6 +41,10 @@ public class Serie {
     public void setEpisodes(List<Episode> episodes) {
         episodes.forEach(e -> e.setSerie(this));
         this.episodes = episodes;
+    }
+
+    public List<Episode> getEpisodes() {
+        return episodes;
     }
 
     public Long getId() {
@@ -59,20 +63,20 @@ public class Serie {
         this.title = title;
     }
 
-    public Integer getSeasons() {
-        return seasons;
+    public Integer getSeason() {
+        return season;
     }
 
-    public void setSeasons(Integer seasons) {
-        this.seasons = seasons;
+    public void setSeason(Integer season) {
+        this.season = season;
     }
 
-    public Double getOmdbRating() {
-        return omdbRating;
+    public Double getImdbRating() {
+        return imdbRating;
     }
 
-    public void setOmdbRating(Double omdbRating) {
-        this.omdbRating = omdbRating;
+    public void setImdbRating(Double imdbRating) {
+        this.imdbRating = imdbRating;
     }
 
     public Category getGenre() {
@@ -113,8 +117,8 @@ public class Serie {
                 "\nGênero: " + genre +
                         "\nTítulo: " + title+
                         "\nSinopse: " + synopsis +
-                        "\nTemporadas: " + seasons+
-                        "\nAvaliação Imdb: " + omdbRating +
+                        "\nTemporadas: " + season +
+                        "\nAvaliação Imdb: " + imdbRating +
                         "\nAtores: " + actors +
                         "\nLink do Pôster: " + poster +
                         "\nEpisodios: " + episodes;

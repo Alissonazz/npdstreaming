@@ -1,24 +1,16 @@
 package com.npd.npdstreaming;
 
-import com.npd.npdstreaming.UserInteraction.Menu;
+import com.npd.npdstreaming.userInteraction.Menu;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class NpdStreamingApplication implements CommandLineRunner {
-
-	private final Menu menu;
-	public NpdStreamingApplication(Menu menu) {
-		this.menu = menu;
-	}
+public class NpdStreamingApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(NpdStreamingApplication.class, args);
 	}
 
-	@Override
-	public void run(String... args) throws Exception {
-		menu.showMenu();
-	}
 }

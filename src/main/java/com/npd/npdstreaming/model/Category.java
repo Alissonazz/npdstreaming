@@ -6,7 +6,8 @@ public enum Category {
     COMEDIA("Comedy", "Comédia"),
     DRAMA("Drama", "Drama"),
     CRIME("Crime", "Crime"),
-    AVENTURA("Adventure", "Aventura");
+    AVENTURA("Adventure", "Aventura"),
+    ANIMACAO("Animation", "Animação");
 
     private String categoryOmdb;
     private String categoryOmdbPtBr;

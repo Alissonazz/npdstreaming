@@ -12,13 +12,13 @@ public class Episode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Integer season;
-    @Column(name = "Title")
+    @Column(name = "title")
     private String titleEpisode;
-    @Column(name = "Number")
+    @Column(name = "number")
     private Integer numberEpisode;
-    @Column(name = "Rating")
+    @Column(name = "rating")
     private Double ratingEpisode;
-    @Column(name = "Release_Date")
+    @Column(name = "release_date")
     private LocalDate releaseDateEpisode;
 
     @ManyToOne
@@ -32,7 +32,7 @@ public class Episode {
         this.numberEpisode = episodeData.number();
 
         try {
-            this.ratingEpisode = Double.valueOf(episodeData.assessment());
+            this.ratingEpisode = Double.valueOf(episodeData.ratingEpisode());
         } catch (NumberFormatException ex) {
             this.ratingEpisode = 0.0;
         }

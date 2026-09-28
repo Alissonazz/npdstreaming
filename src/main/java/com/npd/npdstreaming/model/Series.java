@@ -4,11 +4,9 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 
 @Entity
-@Table(name = "series")
-public class Serie {
+public class Series {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,29 +19,29 @@ public class Serie {
     private Category genre;
     private String actors;
     private String poster;
-    private String synopsis;
+    private String sinopse;
 
     @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Episode> episodes = new ArrayList<>();
+    private List<Episodes> episodes = new ArrayList<>();
 
-    public Serie() {}
+    public Series() {}
 
-    public Serie(SerieData seriesData) {
+    public Series(SerieData seriesData) {
         this.title = seriesData.title();
         this.season = seriesData.seasons();
-        this.imdbRating = OptionalDouble.of(Double.valueOf(seriesData.imdbRating())).orElse(0);
+        this.imdbRating = seriesData.imdbRating() != null ? Double.valueOf(seriesData.imdbRating()) : null;
         this.genre = Category.fromString(seriesData.genre().split(",")[0].trim());
         this.actors = seriesData.actors();
         this.poster = seriesData.poster();
-        this.synopsis = seriesData.synopsis().trim();
+        this.sinopse = seriesData.sinopse().trim();
     }
 
-    public void setEpisodes(List<Episode> episodes) {
+    public void setEpisodes(List<Episodes> episodes) {
         episodes.forEach(e -> e.setSerie(this));
         this.episodes = episodes;
     }
 
-    public List<Episode> getEpisodes() {
+    public List<Episodes> getEpisodes() {
         return episodes;
     }
 
@@ -103,12 +101,12 @@ public class Serie {
         this.poster = poster;
     }
 
-    public String getSynopsis() {
-        return synopsis;
+    public String getSinopse() {
+        return sinopse;
     }
 
-    public void setSynopsis(String synopsis) {
-        this.synopsis = synopsis;
+    public void setSinopse(String sinopse) {
+        this.sinopse = sinopse;
     }
 
     @Override
@@ -116,7 +114,7 @@ public class Serie {
         return
                 "\nGênero: " + genre +
                         "\nTítulo: " + title+
-                        "\nSinopse: " + synopsis +
+                        "\nSinopse: " + sinopse +
                         "\nTemporadas: " + season +
                         "\nAvaliação Imdb: " + imdbRating +
                         "\nAtores: " + actors +

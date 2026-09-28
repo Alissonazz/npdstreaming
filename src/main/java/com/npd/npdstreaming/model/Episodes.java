@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 @Entity
-public class Episode {
+public class Episodes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,11 @@ public class Episode {
     private LocalDate releaseDateEpisode;
 
     @ManyToOne
-    private Serie serie;
+    private Series serie;
 
-    public Episode (){}
+    public Episodes(){}
 
-    public Episode(Integer seasonNumber, EpisodeData episodeData) {
+    public Episodes(Integer seasonNumber, EpisodeData episodeData) {
         this.season = seasonNumber;
         this.titleEpisode = episodeData.title();
         this.numberEpisode = episodeData.number();
@@ -52,11 +52,11 @@ public class Episode {
         this.id = id;
     }
 
-    public Serie getSerie() {
+    public Series getSerie() {
         return serie;
     }
 
-    public void setSerie(Serie serie) {
+    public void setSerie(Series serie) {
         this.serie = serie;
     }
 

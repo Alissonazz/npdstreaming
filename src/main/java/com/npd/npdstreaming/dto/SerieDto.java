@@ -9,5 +9,5 @@ public record SerieDto(Long id,
                        Category genre,
                        String actors,
                        String poster,
-                       String synopsis) {
+                       String sinopse) {
 }

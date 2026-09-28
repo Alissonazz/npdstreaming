@@ -1,13 +1,15 @@
 package com.npd.npdstreaming.model;
 
 public enum Category {
-    ACAO("Action", "Ação"),
+    ACTION("Action", "Ação"),
     ROMANCE("Romance", "Romance"),
-    COMEDIA("Comedy", "Comédia"),
+    COMEDY("Comedy", "Comédia"),
     DRAMA("Drama", "Drama"),
     CRIME("Crime", "Crime"),
-    AVENTURA("Adventure", "Aventura"),
-    ANIMACAO("Animation", "Animação");
+    ADVENTURE("Adventure", "Aventura"),
+    ANIMATION("Animation", "Animação"),
+    BIOGRAPHY("Biography", "Biografia;"),
+    TERROR("Horror", "Terror");
 
     private String categoryOmdb;
     private String categoryOmdbPtBr;

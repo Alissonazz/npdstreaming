@@ -3,9 +3,10 @@ package com.npd.npdstreaming.service;
 import com.npd.npdstreaming.dto.EpisodeDto;
 import com.npd.npdstreaming.dto.SerieDto;
 import com.npd.npdstreaming.model.Category;
-import com.npd.npdstreaming.model.Serie;
+import com.npd.npdstreaming.model.Series;
 import com.npd.npdstreaming.repository.SeriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public class SerieService {
         return dataConvert(seriesRepository.findAll());
     }
 
-    public List<SerieDto> getNewReleases() {
-        return dataConvert(seriesRepository.findTop5Series());
+    public List<SerieDto> getRecentReleases() {
+        return dataConvert(seriesRepository.findRecentReleases(PageRequest.of(0, 5)));
     }
 
     public List<SerieDto> getTop5Series() {
@@ -31,19 +32,19 @@ public class SerieService {
     }
 
     public SerieDto getSerieById(Long id) {
-        Optional<Serie> serie = seriesRepository.findById(id);
+        Optional<Series> serie = seriesRepository.findById(id);
         if(serie.isPresent()) {
-            Serie s = serie.get();
+            Series s = serie.get();
             return new SerieDto(s.getId(), s.getTitle(), s.getSeason(), s.getImdbRating(), s.getGenre(),
-                    s.getActors(), s.getPoster(), s.getSynopsis());
+                    s.getActors(), s.getPoster(), s.getSinopse());
         }
         return null;
     }
 
     public List<EpisodeDto> getAllSeasons(Long id) {
-        Optional<Serie> serie = seriesRepository.findById(id);
+        Optional<Series> serie = seriesRepository.findById(id);
         if(serie.isPresent()) {
-            Serie s = serie.get();
+            Series s = serie.get();
             return s.getEpisodes().stream()
                     .map(e -> new EpisodeDto(e.getTitle(), e.getNumber(), e.getSeason()))
                     .collect(Collectors.toList());
@@ -56,7 +57,7 @@ public class SerieService {
     }
 
     public List<SerieDto> getSeriesByCategory(String categoryName) {
-        Category category = Category.fromStringPt(categoryName);
+        Category category = Category.fromString(categoryName);
         return dataConvert(seriesRepository.findByGenre(category));
     }
 
@@ -64,10 +65,10 @@ public class SerieService {
         return seriesRepository.findByTopEpisodesBySerieId(id);
     }
 
-    private List<SerieDto> dataConvert(List<Serie> series) {
+    private List<SerieDto> dataConvert(List<Series> series) {
         return series.stream()
                 .map(s -> new SerieDto(s.getId(), s.getTitle(), s.getSeason(), s.getImdbRating(), s.getGenre(),
-                        s.getActors(), s.getPoster(), s.getSynopsis()))
+                        s.getActors(), s.getPoster(), s.getSinopse()))
                 .collect(Collectors.toList());
     }
 

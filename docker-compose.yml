@@ -38,7 +38,6 @@ services:
       DB_URL: jdbc:postgresql://postgres:5432/npdstreaming
       DB_PASSWORD: postgres
       OMDB_API_KEY: ${OMDB_API_KEY:-}
-      API_KEY_CHATGPT: ${API_KEY_CHATGPT:-}
 
 volumes:
   postgres_data:

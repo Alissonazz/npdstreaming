@@ -2,7 +2,6 @@ package com.npd.npdstreaming.controller;
 
 import com.npd.npdstreaming.dto.EpisodeDto;
 import com.npd.npdstreaming.dto.SerieDto;
-import com.npd.npdstreaming.model.Category;
 import com.npd.npdstreaming.service.SerieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,9 +28,9 @@ public class SerieController {
         return serieService.getTop5Series();
     }
 
-    @GetMapping("/lancamentos")
-    public List<SerieDto> getNewReleases() {
-        return serieService.getNewReleases();
+    @GetMapping("/releases")
+    public List<SerieDto> getRecentReleases() {
+        return serieService.getRecentReleases();
     }
 
     @GetMapping("/{id}")
@@ -39,22 +38,22 @@ public class SerieController {
         return serieService.getSerieById(id);
     }
 
-    @GetMapping("/{id}/temporadas/todas")
+    @GetMapping("/{id}/seasons/all")
     public List<EpisodeDto> getAllSeasons(@PathVariable Long id) {
         return serieService.getAllSeasons(id);
     }
 
-    @GetMapping("/{id}/temporadas/{season}")
+    @GetMapping("/{id}/seasons/{season}")
     public List<EpisodeDto> getEpisodeBySeason(@PathVariable Long id, @PathVariable Integer season) {
         return serieService.getEpisodeBySeason(id, season);
     }
 
-    @GetMapping("/categoria/{categoryName}")
+    @GetMapping("/category/{categoryName}")
     public List<SerieDto> getSeriesByCategory(@PathVariable String categoryName) {
         return serieService.getSeriesByCategory(categoryName);
     }
 
-    @GetMapping("/{id}/temporadas/top")
+    @GetMapping("/{id}/seasons/bests")
     public List<EpisodeDto> getEpisodesByRating(@PathVariable Long id) {
         return serieService.getEpisodesByRating(id);
     }

@@ -2,34 +2,32 @@ package com.npd.npdstreaming.repository;
 
 import com.npd.npdstreaming.dto.EpisodeDto;
 import com.npd.npdstreaming.model.Category;
-import com.npd.npdstreaming.model.Episode;
-import com.npd.npdstreaming.model.Serie;
+import com.npd.npdstreaming.model.Series;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.domain.Pageable;
 import java.util.List;
-import java.util.Optional;
 
-public interface SeriesRepository extends JpaRepository<Serie, Long> {
+public interface SeriesRepository extends JpaRepository<Series, Long> {
 
-    List<Serie> findByGenre(Category category);
+    List<Series> findByGenre(Category category);
 
-    List<Serie> findTop5ByOrderByImdbRatingDesc();
+    List<Series> findTop5ByOrderByImdbRatingDesc();
 
     @Query("""
-            SELECT s FROM Serie s
-            JOIN s.episodes e
-            GROUP BY s 
-            ORDER BY MAX(e.releaseDateEpisode) DESC
-            LIMIT 5
-            """)
-    List<Serie> findTop5Series();
+        SELECT s FROM Series s 
+        JOIN s.episodes e 
+        WHERE e.releaseDateEpisode IS NOT NULL
+        GROUP BY s.id 
+        ORDER BY MAX(e.releaseDateEpisode) DESC
+        """)
+    List<Series> findRecentReleases(Pageable pageable);
 
-    @Query("SELECT e FROM Serie s JOIN s.episodes e WHERE s.id = :id and e.season = :season")
+    @Query("SELECT e FROM Series s JOIN s.episodes e WHERE s.id = :id and e.season = :season")
     List<EpisodeDto> findEpisodesBySeason(Long id, Integer season);
 
     @Query("""
-            SELECT e FROM Episode e
+            SELECT e FROM Episodes e
             JOIN e.serie s
             WHERE s.id = :id
             ORDER BY e.ratingEpisode DESC

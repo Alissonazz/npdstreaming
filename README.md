@@ -94,7 +94,7 @@ npdstreaming/
 
 ### Pré-requisitos
 
-- [JDK 25](https://adoptium.net/) instalado
+- [JDK 25](https://www.oracle.com/java/technologies/downloads/) instalado
 - [Maven](https://maven.apache.org/download.cgi) instalado (ou uso do Maven Wrapper incluso no projeto)
 - [PostgreSQL 17](https://www.postgresql.org/download/) ou [Docker](https://www.docker.com/) com Docker Compose
 
